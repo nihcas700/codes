@@ -1,0 +1,13 @@
+On a number line lies n bombs located at distinct positions. The i-th bomb is at position ai and strength level bi. When the i-th bomb explodes, it destroys all bombs to its left (towards decreasing coordinates) within distance bi inclusive. 
+The bomb itself is not destroyed (magic bombs). Sulemaan sultaani will fire the bombs one at a time from right to left. If a bomb is destroyed, it cannot be fired again.
+
+Sulemaan sultaani wants Sulemaan bajrangi to add a bomb strictly to the right of all the existing bombs, with any strength and any coordinate, such that the least possible number of bombs are destroyed.
+Note that Sulemaan bajrangi's placement of bomb means it will be the first bomb fired. Help Sulemaan bajrangi finding the minimum number of bombs that could be destroyed.
+
+Input
+first line of input contains a single integer n (1 ≤ n ≤ 100 000) — the initial number of bombs.
+
+The i-th of next n lines contains two integers ai and bi (0 ≤ ai ≤ 1 000 000, 1 ≤ bi ≤ 1 000 000) — the coordinate and strength level of the i-th bomb respectively. No two bomb will have the same position, so if i ≠ j then ai ≠ aj .
+
+Output
+Print a single integer — the minimum number of bombs that could be destroyed if exactly one bomb is added.
