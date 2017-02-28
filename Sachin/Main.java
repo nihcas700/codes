@@ -115,9 +115,13 @@ public class Main {
 
 				for(int k = 0; k < Math.min(len1, len2); k++) {
 
-					if(word1.charAt(k) == word2.charAt(k)) {
+					if(word1.charAt(k) == word2.charAt(k) && (k+1 == len2 && len1 > len2)) {
+						System.out.println("Impossible");
+						return;
+					} else if (word1.charAt(k) == word2.charAt(k)) {
 						continue;
-					} else {
+					}
+					else {
 
 						char ch1 = word1.charAt(k), ch2 = word2.charAt(k);
 						// System.out.println(ch1 + "   " + ch2);
