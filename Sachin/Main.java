@@ -2,142 +2,90 @@ import java.util.*;
 
 public class Main {
 
-	public static class Graph {
+	public static int giveLastAffectedIndex(int start, int end, Bomb[] bombs, int impactTill, int baseIndex) {
 
-		public Node[] nodes = new Node[26];
-		public int[] isVisited = new int[26];
-		private String orderedString;
-		private Stack<Character> stack = new Stack<>();
+		if(start > end) {
 
-		public Graph() {
-
-			for(int i = 0; i < 26; i++) {
-
-				nodes[i] = new Node((char) ('a' + i), i);
-				isVisited[i] = 0;
-			}
+			return Integer.MAX_VALUE;
 		}
 
-		public boolean getTopologicalOrderOfNodesIfPossible() {
+		if(start == end) {
 
-			for(int i = 0; i < 26; i++) {
-
-				if(isVisited[nodes[i].identifier] == 0) {
-
-					// System.out.println("dfs for " + nodes[i].identifier);
-					boolean isCycle = dfs(nodes[i], stack);
-
-					if(isCycle) {
-						// System.out.println("cycle detected for " + nodes[i].identifier);
-						return false;
-					}
-
-				}
-
+			if(bombs[start].location >= impactTill) {
+				return start;
 			}
 
-			return true;
+			return (baseIndex);
 		}
 
-		public boolean dfs(Node root, Stack<Character> stack) {
+		int mid = start + ((end - start) / 2);
 
-			isVisited[root.identifier] = 1;
+		if(bombs[mid].location >= impactTill) {
 
-			for(Node child : root.children) {
+			return giveLastAffectedIndex(start, mid, bombs, impactTill, baseIndex);
+		} else {
 
-				if(isVisited[child.identifier] == 0) {
-
-					boolean isCycle = dfs(child, stack);
-
-					if(isCycle) return isCycle;
-
-				} else if (isVisited[child.identifier] == 1) {
-
-					return true;
-				}
-			}
-
-			isVisited[root.identifier] = 2;
-			stack.push(root.ch);
-			
-			return false;
+			return giveLastAffectedIndex(mid+1, end, bombs, impactTill, baseIndex);
 		}
-
-		public String getOrderedString() {
-
-			StringBuilder sb = new StringBuilder();
-			while(!stack.empty()) {
-
-				sb.append(stack.pop());
-			}
-			return sb.toString();
-		}
-
 	}
 
-	public static class Node {
+	public static class Bomb{
 
-		public char ch;
-		public int identifier;
-		public List<Node> children = new ArrayList<>();
+		public int location;
+		public int strength;
+	}
 
-		public Node(char ch, int identifier) {
+	public static class BombComparator implements Comparator<Bomb> {
 
-			this.ch = ch;
-			this.identifier = identifier;
-		}
+    	@Override
+   		public int compare(Bomb a, Bomb b) {
+        	return (a.location < b.location) ? -1 : 1;
+    	}
 	}
 
 	public static void main(String[] args) {
 
-		int N;
 		Scanner sc = new Scanner(System.in);
-		
 
-		N = sc.nextInt();
-		String[] words = new String[N];
+		int N = sc.nextInt();
+		Bomb[] bombs = new Bomb[N];
+		int[] cumLosses = new int[N];
+		int answer = Integer.MAX_VALUE;
 
 		for(int i = 0; i < N; i++) {
 
-			words[i] = sc.next();
+			bombs[i] = new Bomb();
+			bombs[i].location = sc.nextInt();
+			bombs[i].strength = sc.nextInt();
 		}
 
-		Graph g = new Graph();
+		Collections.sort(Arrays.asList(bombs), new BombComparator());
 
 		for(int i = 0; i < N; i++) {
 
-			for(int j = i+1; j < N; j++) {
+			int lossIndex = giveLastAffectedIndex(0, i-1, bombs, bombs[i].location - bombs[i].strength, i);
 
-				String word1 = words[i];
-				String word2 = words[j];
+			// System.out.println(lossIndex);
+			int nextExplodeIndex = lossIndex - 1;
 
-				int len1 = word1.length(), len2 = word2.length();
+			if(i > 0) {
 
-				for(int k = 0; k < Math.min(len1, len2); k++) {
-
-					if(word1.charAt(k) == word2.charAt(k) && (k+1 == len2 && len1 > len2)) {
-						System.out.println("Impossible");
-						return;
-					} else if (word1.charAt(k) == word2.charAt(k)) {
-						continue;
-					}
-					else {
-
-						char ch1 = word1.charAt(k), ch2 = word2.charAt(k);
-						// System.out.println(ch1 + "   " + ch2);
-						g.nodes[ch1 - 'a'].children.add(g.nodes[ch2 - 'a']);
-						break;
-					}
-
+				if(nextExplodeIndex >= 0) {
+					cumLosses[i] = cumLosses[nextExplodeIndex] + i - nextExplodeIndex - 1;
+				} else {
+					cumLosses[i] = i;
 				}
+			} else {
+				cumLosses[0] = 0;
 			}
+
+			// System.out.println(cumLosses[i]);
+
+			answer = Math.min(answer, ((N - 1 - i) + cumLosses[i]));
 		}
 
-		if(g.getTopologicalOrderOfNodesIfPossible()) {
+		System.out.println(answer);
 
-			System.out.println(g.getOrderedString());
-		} else {
-			System.out.println("Impossible");
-		}
 	}
 }
+
