@@ -10,15 +10,14 @@ int main(){
   cin >> str;
   int l = strlen(str);
 
-  for(int i = 0; i < l; ){
+  for(int i = 0; i < l; i++){
     memset(char_occurance, 0, sizeof(char_occurance));
     int count = 0, j;
-    for(j = i; j < l && char_occurance[str[j] - 'a'] == 0; j++){
-      char_occurance[str[j] - 'a'] = 1;
+    for(j = i; j < l && char_occurance[str[j] - (int)NULL] == 0; j++){
+      char_occurance[str[j] - (int)NULL] = 1;
       count++;
     }
     res = max(res, count);
-    i = j;
   }
   cout << res << endl;
   return 0;
