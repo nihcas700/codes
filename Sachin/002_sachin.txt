@@ -31,3 +31,7 @@ Output
 
 For each test case output a single line with an uppercase “Y” if it is possible for Potter to escape
 from the prison, or an uppercase “N” otherwise.
+
+Constraints
+Time limit:	0.968s
+Large input set, use faster IO
