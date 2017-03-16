@@ -1,0 +1,33 @@
+Potter is currently a prisoner of the Azkaban, the
+most horrible prison in the world. It was designed by Dumbeldore, the prison is tricky and
+not necesarilly closed, only an incredibly fast and logical mind can get out.
+The prison is made of N cells connected by M paths. Each path connects exactly
+two cells and can be traversed in any direction. Each cell is either empty, contains
+a single locked door, or contains a single key. No cell contains both a door and a
+key. There are K doors and K keys in the whole prison. Each key opens a different door, and
+each door is opened by a different key. If a cell contains a door, the corresponding key is
+needed to enter the cell, regardless of which path was used to reach it.
+Potter found the complete map of the prison, including the location of each door and each key,
+and wants to know how to get out. According to the map, Potter is now in
+cell number 1, and the exit is in cell N . Given the information on the map, let Potter
+know if it is possible to escape or if he is doomed forever.
+
+Input
+
+The input contains several test cases, each one described in several lines. The first line of each
+test case contains three integers N , K, and M separated by single spaces. The value N is the
+number of cells in the prison (4 ≤ N ≤ 105 ); each cell is identified by an integer
+number between 1 and N . The value K is the number of doors and keys (1 ≤ K ≤ N/2), while
+M is the number of paths (1 ≤ M ≤ 105 ). Each of the next K lines describes a door and its
+corresponding key using two integers A and B separated by a single space, with the following
+meaning: cell A cointains the key that opens the door in cell B (2 ≤ A, B ≤ N − 1).
+The last M lines of the test case describe the paths. Each of these lines cointains two integers
+C and D separated by a single space, indicating that there is a path connecting cells
+C and D (1 ≤ C < D ≤ N ). You may assume that no two paths connect the same pair of
+cells. The last line of the input contains the number −1 three times separated by single
+spaces and should not be processed as a test case.
+
+Output
+
+For each test case output a single line with an uppercase “Y” if it is possible for Potter to escape
+from the prison, or an uppercase “N” otherwise.
