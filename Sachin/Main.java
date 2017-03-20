@@ -1,91 +1,194 @@
 import java.util.*;
 
 public class Main {
+	
+	public static class Graph {
 
-	public static int giveLastAffectedIndex(int start, int end, Bomb[] bombs, int impactTill, int baseIndex) {
+		public Node[] nodes;
+		public int[] isVisited;
+		public Map<Key, Boolean> doneKeys;
+		public int N;
+		public int K;
 
-		if(start > end) {
+		public Graph(Map<Integer, Integer> nodeTypeMapping, Map<Integer, List<Integer>> edges, int N, int K) {
 
-			return Integer.MAX_VALUE;
-		}
+			doneKeys = new HashMap<>();
+			isVisited = new int[N+1];
+			this.N = N;
+			this.K = K;
 
-		if(start == end) {
+			for(int i = 1; i <= N; i++) {
 
-			if(bombs[start].location >= impactTill) {
-				return start;
+				isVisited[i] = 0;
 			}
 
-			return (baseIndex);
+			nodes = new Node[N+1];
+
+			for(Map.Entry entry : nodeTypeMapping.entrySet()) {
+
+				int key = (int)entry.getKey();
+				int val = (int)entry.getValue();
+
+				nodes[key] = new Key(val, key);
+				nodes[val] = new Door(key, val);
+			}
+
+			for(int i = 1; i <= N; i++) {
+
+				if(nodes[i] == null) {
+
+					nodes[i] = new Empty(i);
+				}
+			}
+
+			for(Map.Entry entry : edges.entrySet()) {
+
+				int key = (int)entry.getKey();
+				List<Integer> list = (List<Integer>)entry.getValue();
+
+				for(Integer val : list) {
+
+					nodes[key].children.add(nodes[val]);
+					nodes[val].children.add(nodes[key]);
+				}
+
+			}
 		}
 
-		int mid = start + ((end - start) / 2);
+		public void getNextUnlockedKeys(Node node) {
 
-		if(bombs[mid].location >= impactTill) {
+			if(node instanceof Key) {
 
-			return giveLastAffectedIndex(start, mid, bombs, impactTill, baseIndex);
-		} else {
+				doneKeys.put((Key)node, true);
+			}
+			
+			if(node instanceof Door && !doneKeys.containsKey(nodes[((Door)node).mappedKey])) {
 
-			return giveLastAffectedIndex(mid+1, end, bombs, impactTill, baseIndex);
+				isVisited[node.num] = 5;
+				return;
+			}
+
+			isVisited[node.num] = 1;
+
+			for(Node child : node.children) {
+
+				if(isVisited[child.num] == 0) {
+
+					getNextUnlockedKeys(child);
+				}
+			}
+
+			if(node instanceof Key && isVisited[((Key)node).mappedDoor] == 5) {
+
+				getNextUnlockedKeys(nodes[((Key)node).mappedDoor]);
+			}
+		}
+
+		public boolean checkPossibility() {
+
+			boolean ans = true;
+
+			getNextUnlockedKeys(nodes[1]);
+
+			for(int i = 1; i <= N; i++) {
+
+				if(nodes[i] instanceof Door && isVisited[i] != 1) {
+
+					ans = false;
+					break;
+				}
+			}
+
+			return (ans && isVisited[N] == 1);
+		}
+
+	}
+
+	public static class Door extends Node {
+
+		public int mappedKey;
+
+		public Door(int mappedKey, int num) {
+
+			super(num);
+			this.mappedKey = mappedKey;
 		}
 	}
 
-	public static class Bomb{
+	public static class Key extends Node {
 
-		public int location;
-		public int strength;
+		public int mappedDoor;
+		public Key(int mappedDoor, int num) {
+
+			super(num);
+			this.mappedDoor = mappedDoor;
+		}
 	}
 
-	public static class BombComparator implements Comparator<Bomb> {
+	public static class Empty extends Node {
 
-    	@Override
-   		public int compare(Bomb a, Bomb b) {
-        	return (a.location < b.location) ? -1 : 1;
-    	}
+		public Empty(int num) {
+			super(num);
+		}
+	}
+
+	public static class Node {
+
+		public int num;
+		public List<Node> children;
+
+		public Node(int num) {
+
+			this.num = num;
+			children = new ArrayList<>();
+		}
 	}
 
 	public static void main(String[] args) {
 
 		Scanner sc = new Scanner(System.in);
 
-		int N = sc.nextInt();
-		Bomb[] bombs = new Bomb[N];
-		int[] cumLosses = new int[N];
-		int answer = Integer.MAX_VALUE;
+		while(true) {
 
-		for(int i = 0; i < N; i++) {
+			int N = sc.nextInt();
+			int M = sc.nextInt();
+			int K = sc.nextInt();
 
-			bombs[i] = new Bomb();
-			bombs[i].location = sc.nextInt();
-			bombs[i].strength = sc.nextInt();
-		}
+			if(N == -1) break;
 
-		Collections.sort(Arrays.asList(bombs), new BombComparator());
+			Map<Integer, Integer> nodeTypeMapping = new HashMap<>();
+			Map<Integer, List<Integer>> edges = new HashMap<>();
 
-		for(int i = 0; i < N; i++) {
+			for(int i = 0; i < K; i++) {
 
-			int lossIndex = giveLastAffectedIndex(0, i-1, bombs, bombs[i].location - bombs[i].strength, i);
+				int key = sc.nextInt();
+				int door = sc.nextInt();
 
-			// System.out.println(lossIndex);
-			int nextExplodeIndex = lossIndex - 1;
-
-			if(i > 0) {
-
-				if(nextExplodeIndex >= 0) {
-					cumLosses[i] = cumLosses[nextExplodeIndex] + i - nextExplodeIndex - 1;
-				} else {
-					cumLosses[i] = i;
-				}
-			} else {
-				cumLosses[0] = 0;
+				nodeTypeMapping.put(key, door);
 			}
 
-			// System.out.println(cumLosses[i]);
+			for(int i = 0; i < M; i++) {
 
-			answer = Math.min(answer, ((N - 1 - i) + cumLosses[i]));
+				int start = sc.nextInt();
+				int end = sc.nextInt();
+
+				if(!edges.containsKey(start)) {
+					edges.put(start, new ArrayList<>());
+				}
+
+				edges.get(start).add(end);
+			}
+
+			Graph graph = new Graph(nodeTypeMapping, edges, N, K);
+
+			if(graph.checkPossibility()) {
+
+				System.out.println("Y");
+			} else {
+				System.out.println("N");
+			}
+
 		}
-
-		System.out.println(answer);
 
 	}
 }
-
