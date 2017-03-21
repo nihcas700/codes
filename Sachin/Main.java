@@ -151,8 +151,8 @@ public class Main {
 		while(true) {
 
 			int N = sc.nextInt();
-			int M = sc.nextInt();
 			int K = sc.nextInt();
+			int M = sc.nextInt();
 
 			if(N == -1) break;
 
